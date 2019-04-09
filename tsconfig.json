@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target":"es5",
+		"outDir": "lib",
+		"rootDir": "src",
+		"lib": ["es2017","dom"],
+		"sourceMap": false,
+		"composite": true
+	},
+	"include": ["src"],
+	"exclude": ["node_modules", ".vscode"]
+}

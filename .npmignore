@@ -1,0 +1,8 @@
+src/
+npm-debug.log
+node_modules
+db.json
+public/
+source
+build/
+demo/
