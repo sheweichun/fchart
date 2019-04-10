@@ -19,7 +19,7 @@
 
 ![](https://img.alicdn.com/tfs/TB1O4K0QmzqK1RjSZFLXXcn2XXa-934-426.png)
 
-这是图展示了一个最基本的图表的组成部分(**我们有浅入深**)，它包含以下部分:
+这是图展示了一个最基本的图表的组成部分(**我们由浅入深**)，它包含以下部分:
 
 * X轴
 * Y轴
@@ -37,10 +37,10 @@
 ![](https://img.alicdn.com/tfs/TB1L5xKQAvoK1RjSZFwXXciCFXa-1768-904.png)
 
 
-## 初步Demo
+## 演示Demo
 
 ```javascript
-//很显然 这个是跑步起来的
+//很显然 这个是跑不起来的
 import Fchart from '../lib/index'
 
 const chart = new Fchart({

@@ -1,9 +1,9 @@
 # fchart
 
 
-## 迭代过程
+## 教你开发图表库系列
 
-[第一章](./dev_doc/Chapter_One.md)
+[第一章(初期准备)](./dev_doc/Chapter_One.md)
 
 
 ## 开发
