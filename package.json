@@ -7,7 +7,8 @@
     "unpkg": "dist/fchart.js",
     "jsdelivr": "dist/fchart.js",
     "scripts":{
-      "dev":"parcel demo/index.html",
+      "dev":"npm run watch & npm run demo",
+      "demo":"parcel demo/index.html",
       "watch":"tsc -w",
       "build":"tsc"
     },
