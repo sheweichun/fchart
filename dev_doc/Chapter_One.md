@@ -2,6 +2,8 @@
 
 # 教你开发图表库系列第一章
 
+[工程分支](https://github.com/sheweichun/fchart/blob/Chapter_One/dev_doc/Chapter_One.md)
+
 整个系列里作者会带着大家一起完成一个从0到1图表库的开发，欢迎来[这里](https://github.com/sheweichun/fchart)踊跃拍砖
 
 估计很多人会问，现在开源世界里的图表库多如牛毛，为什么自己还要再弄个图表库呢?
