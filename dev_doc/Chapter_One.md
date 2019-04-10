@@ -31,12 +31,16 @@
 * 标题、副标题
 
 
-## 架构图
+## 初步建模
+
+
+![](https://img.alicdn.com/tfs/TB1L5xKQAvoK1RjSZFwXXciCFXa-1768-904.png)
 
 
 ## 初步Demo
 
 ```javascript
+//很显然 这个是跑步起来的
 import Fchart from '../lib/index'
 
 const chart = new Fchart({
