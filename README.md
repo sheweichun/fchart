@@ -20,3 +20,9 @@ npm run dev
 关注我们的公众号FE One，除了会分享fchart的开发过程，还会不定期分享JS函数式编程、深入Reaction、Rxjs、工程化、WebGL、中后台构建等前端知识
 
 
+
+
+# issue
+
+横坐标刻度值能够根据bar的正负转换方向
+最大值和最小值需要更新
