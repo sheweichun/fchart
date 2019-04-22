@@ -1,9 +1,11 @@
-# fchart
+<p align="center">
+    <img style="width:200px;" src="https://img.alicdn.com/tfs/TB1ApeOSiLaK1RjSZFxXXamPFXa-340-250.svg"><br/>
+</p>
 
 
-## 教你开发图表库系列
+## 开发过程记录
 
-[第一章(初期准备)](./dev_doc/Chapter_One.md)
+[图表雏形](./dev_doc/Chapter_One.md)
 
 
 ## 开发

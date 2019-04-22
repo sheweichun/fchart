@@ -218,7 +218,6 @@ export default class Axis implements IAxis{
     y:number
     textAlign:CanvasTextAlign
     textBaseline:CanvasTextBaseline
-    // splitNumber:number
     tickWidth:number
     tickUnit:number
     unitWidth:number
@@ -232,12 +231,9 @@ export default class Axis implements IAxis{
         this.data = (opt.data || []) as string[]
         const mergeOpt = assign({},defaultAxisOpt,opt || {}) as AxisOpt;
         const {x,y,length,axisTick,axisLabel,axisLine,horizontal,reverse,splitNumber,boundaryGap} = mergeOpt;
-        // this.boundaryGap = splitNumber != null ? false : boundaryGap;
         this.boundaryGap = boundaryGap;
-        // console.log('boundaryGap :',boundaryGap);
         this.x = x;
         this.y = y; 
-        // const dLen = boundaryGap ? this.data.length : this.data.length - 1
         const dLen = this.data.length - 1
         const rSplitNumber =  splitNumber || dLen;
         this.tickUnit = Math.ceil(dLen / rSplitNumber); // tick之间包含的数据点个数,不包含最后一个
@@ -253,18 +249,17 @@ export default class Axis implements IAxis{
         },defaultAxisLabel, axisLabel || {});
         this.axisLineOpt = assign({},defaultAxisLine, axisLine || {});
         this.parseStartAndEndPoint(mergeOpt);
-        // let interator = opt.horizontal ? this.createHorizontalickAndLabels : this.createVerticalickAndLabels
         if(horizontal){
             this.textAlign = "center";
             this.textBaseline = reverse ? "bottom" : "top";
-            this.createHorizontalickAndLabels(mergeOpt)
+            this.createHorizontatickAndLabels(mergeOpt)
         }else{
             this.textAlign = reverse ? "left" : "right";
             this.textBaseline = "middle";
-            this.createVerticalickAndLabels(mergeOpt);
+            this.createVerticatickAndLabels(mergeOpt);
         }
     }
-    createHorizontalickAndLabels(opt:AxisOpt){
+    createHorizontatickAndLabels(opt:AxisOpt){
         const ticks = [];
         const labels = [];
         let count = 0;
@@ -295,7 +290,7 @@ export default class Axis implements IAxis{
         this.ticks = ticks
        
     }
-    createVerticalickAndLabels(opt:AxisOpt){
+    createVerticatickAndLabels(opt:AxisOpt){
         const ticks = [];
         const labels = [];
         let count = 0;

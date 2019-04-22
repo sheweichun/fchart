@@ -20,6 +20,9 @@ export default class Painter implements IPainter{
         return this._ctx
     }
     clear(){
+        // const {_ctx} = this;
+        // _ctx.fillStyle = `rgba(255,255,255, 0.3)`;
+        // _ctx.fillRect(0,0,this.width,this.height)
         this._ctx.clearRect(0,0,this.width,this.height)
     }
     retinaScale(forceRatio:number) {

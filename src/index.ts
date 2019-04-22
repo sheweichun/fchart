@@ -1,10 +1,10 @@
 import {YAxis,XAxis} from './widgets/axis';
 import {AxisOpt} from './interfaces/iaxis'
 import Painter from  './painter';
-import Text from './widgets/text'
+// import Text from './widgets/text'
 import Area from './widgets/area';
 import assign from './util/assign';
-import {maxAndMin,getUnitsFromMaxAndMin} from './util/math';
+import {maxAndMin} from './util/math';
 import LineSerial from './widgets/serials/lineSerial';
 import BarSerial  from './widgets/serials/barSerial';
 import { ILazyWidget } from './interfaces/iwidget';
@@ -36,11 +36,10 @@ type SerialOption = {
 }
 
 const DEFAULT_CHART_OPTION:ChartOption = {
-    padding:[40,40,40,40],
+    padding:[40,40,40,40]
 }
 
 export default class Fchart{
-    // xAxis:XAxis
     XAxisList:XAxis[] = []
     YAxisList:YAxis[] = []
     series:Array<ILazyWidget>
@@ -50,10 +49,10 @@ export default class Fchart{
     paddingBottom:number
     paddingLeft:number
     paintArea:Area
-    constructor(private canvas:HTMLCanvasElement,option:ChartOption){
+    constructor(canvas:HTMLCanvasElement,option:ChartOption){
         const mergeOption = assign({},DEFAULT_CHART_OPTION,option);
         this.painter = new Painter(canvas,mergeOption);
-        const {padding,series} = mergeOption;
+        const {padding,series,xAxis,yAxis} = mergeOption;
         this.paddingTop = padding[0];
         this.paddingRight = padding[1];
         this.paddingBottom = padding[2];
@@ -67,7 +66,13 @@ export default class Fchart{
             width:width - (this.paddingLeft + this.paddingRight),
             height:height - (this.paddingTop + this.paddingBottom)
         })
-        new Text(centerX,this.paddingTop / 2,'Title',{}).draw(this.painter);
+        this.createXYAxises(series,xAxis,yAxis);
+        this.createSerialCharts(series);
+        this.init();
+        this.draw(); 
+        Animation.startAnimation(this.painter,this.draw.bind(this));
+    }
+    createXYAxises(series:Array<SerialOption>,xAxis:AxisOpt,yAxis:AxisOpt){
         const yAxisItemList = [],xAxisItemList = []
         series.forEach((serial)=>{
             const {data,yAxisIndex = 0,xAxisIndex = 0} = serial
@@ -83,7 +88,6 @@ export default class Fchart{
             }
             let {max,min} = maxAndMin(data,yAxisItem);
             if(min > 0) {min = 0}
-            // console.log('max :',max);
             yAxisItem.min = min
             yAxisItem.max = max
             xAxisItem.min = min
@@ -94,16 +98,17 @@ export default class Fchart{
                 max:item.max,
                 min:item.min,
                 axisIndex:index,
-                axisOpt:{}
+                axisOpt:(yAxis || {}) as AxisOpt
             });
         })
         this.XAxisList = xAxisItemList.map((item,index)=>{
-            // const {max,min} = getUnitsFromMaxAndMin(item.max,item.min)
             return new XAxis(this.paintArea,this.YAxisList,{
                 axisIndex:index,
-                axisOpt:option.xAxis
+                axisOpt:(xAxis || {}) as AxisOpt
             });
         })
+    }
+    createSerialCharts(series:Array<SerialOption>,){
         const {colors} = Global.defaultConfig;
         this.series = series.map((serial,index)=>{
             const {yAxisIndex = 0,xAxisIndex = 0} = serial
@@ -120,29 +125,18 @@ export default class Fchart{
                 if(baseOpt.lineStyle == null){
                     baseOpt.lineStyle = {};
                 }
-                if(baseOpt.pointStyle == null){
-                    baseOpt.pointStyle = {}
-                }
+                baseOpt.lineStyle = baseOpt.lineStyle || {}
+                baseOpt.pointStyle = baseOpt.pointStyle || {}
                 baseOpt.pointStyle.borderColor = curColor
                 baseOpt.lineStyle.color = curColor;
-
                 return new LineSerial(baseOpt)
             }else if(type === 'bar'){
-                if(baseOpt.barStyle == null){
-                    baseOpt.barStyle = {color:null};
-                }
+                baseOpt.barStyle = baseOpt.barStyle || {color:null}
                 baseOpt.barStyle.color = curColor;
                 xAxis.option.axisOpt.boundaryGap = true;
                 return new BarSerial(baseOpt)
             }
         })
-        // this.xAxis = new XAxis(this.paintArea,{
-        //     axisIndex:0,
-        //     axisOpt:option.xAxis
-        // });
-        this.init();
-        this.draw(); 
-        Animation.startAnimation(this.painter,this.draw.bind(this));
     }
     init(){
         this.YAxisList.forEach((yAxis)=>{

@@ -159,8 +159,8 @@ export default class Point implements IPointWidet{
         this.diffY = this.targetY - this.startY;
     } 
     transtion(tm:number,duration:number):boolean | void{
-		this.x = Easing.easeInQuad(tm,this.startX,this.diffX,duration);
-        this.y = Easing.easeInQuad(tm,this.startY,this.diffY,duration);
+		this.x = Easing.easeInOutCubic(tm,this.startX,this.diffX,duration);
+        this.y = Easing.easeInOutCubic(tm,this.startY,this.diffY,duration);
     }
     draw(painter:IPainter){
 		const {ctx} = painter

@@ -62,7 +62,7 @@ export default class Line implements IAnimationWidget{
     transtion(tm:number,duration:number):boolean | void{
         const {smooth} = this.option 
         this.data.forEach((item,i)=>{
-            item.y = Easing.easeInQuad(tm,item.startY,item.diffY,duration);
+            item.y = Easing.easeInOutCubic(tm,item.startY,item.diffY,duration);
             smooth && transformPoint(item,i,this.data)
         })
     }

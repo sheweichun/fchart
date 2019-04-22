@@ -30,7 +30,7 @@ export default class Rect implements IAnimationWidget{
         this.diffHeight = this.targetHeight;
     } 
     transtion(tm:number,duration:number):boolean | void{
-        this.height = Easing.easeInQuad(tm,this.startHeight,this.diffHeight,duration);
+        this.height = Easing.easeInOutCubic(tm,this.startHeight,this.diffHeight,duration);
     }
     draw(painter:IPainter){
         const {ctx} = painter;
