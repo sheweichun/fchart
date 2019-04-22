@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img style="width:200px;" src="https://img.alicdn.com/tfs/TB1ApeOSiLaK1RjSZFxXXamPFXa-340-250.svg"><br/>
+    <img  src="https://img.alicdn.com/tfs/TB1tTS0ShnaK1RjSZFtXXbC2VXa-200-147.svg"><br/>
 </p>
 
 # 教你开发图表库fchart系列第一章
