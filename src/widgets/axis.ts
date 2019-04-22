@@ -232,7 +232,8 @@ export default class Axis implements IAxis{
         const mergeOpt = assign({},defaultAxisOpt,opt || {}) as AxisOpt;
         const {x,y,length,axisTick,axisLabel,axisLine,horizontal,reverse,splitNumber,boundaryGap} = mergeOpt;
         this.boundaryGap = boundaryGap;
-        this.x = x;
+        /*x,y为轴线的中心 */
+        this.x = x; 
         this.y = y; 
         const dLen = this.data.length - 1
         const rSplitNumber =  splitNumber || dLen;
@@ -248,15 +249,15 @@ export default class Axis implements IAxis{
             color:Global.defaultConfig.text.color
         },defaultAxisLabel, axisLabel || {});
         this.axisLineOpt = assign({},defaultAxisLine, axisLine || {});
-        this.parseStartAndEndPoint(mergeOpt);
+        this.parseStartAndEndPoint(mergeOpt); //解析轴线的起点start和终点end
         if(horizontal){
             this.textAlign = "center";
             this.textBaseline = reverse ? "bottom" : "top";
-            this.createHorizontatickAndLabels(mergeOpt)
+            this.createHorizontatickAndLabels(mergeOpt) //创建横向的刻度和label
         }else{
             this.textAlign = reverse ? "left" : "right";
             this.textBaseline = "middle";
-            this.createVerticatickAndLabels(mergeOpt);
+            this.createVerticatickAndLabels(mergeOpt); //创建垂直的刻度和label
         }
     }
     createHorizontatickAndLabels(opt:AxisOpt){
@@ -276,8 +277,8 @@ export default class Axis implements IAxis{
             dataLen = this.data.length
             baseLabelX = 0
         }
+        const reverseNum = reverse ? -1 : 1;
         for(i = 0; i < dataLen; i+= this.tickUnit){
-            const reverseNum = reverse ? -1 : 1;
             const newX = baseX + count  * this.tickWidth;
             let start = y,end = y + tickLen * reverseNum;
             let endPos = labelBase + tickLen * reverseNum 
@@ -296,10 +297,9 @@ export default class Axis implements IAxis{
         let count = 0;
         const {x,y,reverse,tickLen,length,labelBase,offset} = opt;
         const baseY = (y+length/2)
-        // const dataLen = this.boundaryGap ? this.data.length + 1 : this.data.length;
+        const reverseNum = reverse ? -1 : 1;
         const dataLen = this.data.length;
         for(let i = 0; i < dataLen; i+= this.tickUnit){
-            const reverseNum = reverse ? -1 : 1;
             const newY = baseY  - count  * this.tickWidth;
             let start = x,end = x - tickLen * reverseNum;
             let endPos = labelBase - tickLen * reverseNum;

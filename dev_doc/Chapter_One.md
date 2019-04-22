@@ -71,39 +71,72 @@
 ```typescript
 ...
 constructor(opt:AxisOpt){
-    this.data = (opt.data || []) as string[]
+    this.data = (opt.data || []) as string[] //label数据
     const mergeOpt = assign({},defaultAxisOpt,opt || {}) as AxisOpt;
     const {x,y,length,axisTick,axisLabel,axisLine,horizontal,reverse,splitNumber,boundaryGap} = mergeOpt;
     this.boundaryGap = boundaryGap;
-    this.x = x;
+    /*x,y为轴线的中心 */
+    this.x = x; 
     this.y = y; 
     const dLen = this.data.length - 1
-    const rSplitNumber =  splitNumber || dLen;
+    const rSplitNumber =  splitNumber || dLen; //轴要分成几段
     this.tickUnit = Math.ceil(dLen / rSplitNumber); // tick之间包含的数据点个数,不包含最后一个
     this.unitWidth = length / (dLen + ( this.boundaryGap ?  this.tickUnit : 0)); //每个数据点之间的距离
     this.tickWidth = this.tickUnit * this.unitWidth; //每个tick的宽度
-    this.length = length;
-    this.axisTickOpt = assign({},defaultAxisTick,axisTick || {})
-    this.axisLabelOpt = assign({
-        fontSize:Global.defaultConfig.text.fontSize,
-        fontFamily:Global.defaultConfig.text.fontFamily,
-        fontWeight:Global.defaultConfig.text.fontWeight,
-        color:Global.defaultConfig.text.color
-    },defaultAxisLabel, axisLabel || {});
-    this.axisLineOpt = assign({},defaultAxisLine, axisLine || {});
-    this.parseStartAndEndPoint(mergeOpt);
+    this.length = length; //轴长度
+    ... //省略掉一些配置参数的解析 
+    this.parseStartAndEndPoint(mergeOpt); //解析轴线的起点start和终点end
     if(horizontal){
         this.textAlign = "center";
         this.textBaseline = reverse ? "bottom" : "top";
-        this.createHorizontatickAndLabels(mergeOpt)
+        this.createHorizontatickAndLabels(mergeOpt) //创建横向的刻度和label
     }else{
         this.textAlign = reverse ? "left" : "right";
         this.textBaseline = "middle";
-        this.createVerticatickAndLabels(mergeOpt);
+        this.createVerticatickAndLabels(mergeOpt); //创建垂直的刻度和label
     }
 }
 ...
 ```
+
+大部分还是参数的解析，核心我们还是看下createHorizontatickAndLabels
+
+* (createHorizontatickAndLabels)[https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L262]
+```typescript
+createHorizontatickAndLabels(opt:AxisOpt){
+    const ticks = []; //刻度列表
+    const labels = []; //label列表
+    let count = 0;
+    let i:number;
+    const {boundaryGap} = this;
+    const {x,y,reverse,tickLen,length,labelBase,offset} = opt;
+    const baseX = (x-length/2) //起点的x值
+    /* 设置了boundaryGap，则表示在在轴的左右两侧分别保留半个刻度长度的间隔 */
+    let dataLen:number,baseLabelX:number; 
+    if(boundaryGap){
+        dataLen = this.data.length + 1
+        baseLabelX = this.tickWidth / 2 //label的起始X偏移半个刻度宽度
+    }else{
+        dataLen = this.data.length
+        baseLabelX = 0
+    }
+    const reverseNum = reverse ? -1 : 1; //刻度是向内还是向外
+    for(i = 0; i < dataLen; i+= this.tickUnit){ //根据前面计算的tickUnit创建对应刻度和label
+        const newX = baseX + count  * this.tickWidth; //计算当前刻度的x
+        let start = y,end = y + tickLen * reverseNum; //计算刻度的起始Y和终点Y
+        let endPos = labelBase + tickLen * reverseNum  //根据labelBase计算label的Y值
+        const value = this.data[i];
+        ticks.push(new AxisTick({x:newX,y:start},{x:newX,y:end},this.axisTickOpt))
+        labels.push(new AxisLabel(newX + baseLabelX,endPos + offset * reverseNum,value));
+        count++;
+    }
+    this.labels = labels;
+    this.ticks = ticks;
+}
+```
+[AxisTick](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L39)和[AxisLabel](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L33)都是直接传入的参数分别绘制线条和点，比较简单，不展开讲解
+
+
 
 ###
 

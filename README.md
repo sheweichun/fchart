@@ -3,6 +3,11 @@
 </p>
 
 
+## Demo演示
+
+
+![](./dev_doc/demo.gif)
+
 ## 开发过程记录
 
 [图表雏形](./dev_doc/Chapter_One.md)
