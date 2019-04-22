@@ -22,14 +22,17 @@ npm run dev
 
 ## 关注
 
-![](https://img.alicdn.com/tfs/TB1Vp7bQhTpK1RjSZFKXXa2wXXa-258-258.png)
+<p align="center">
+    <img  src="https://user-gold-cdn.xitu.io/2019/4/10/16a055f03c53753f?w=258&h=258&f=png&s=7273"><br/>
+    <span>FE One</span>
+</p>
 
-关注我们的公众号FE One，除了会分享fchart的开发过程，还会不定期分享JS函数式编程、深入Reaction、Rxjs、工程化、WebGL、中后台构建等前端知识
+<center style="font-size:12px;color:#999;">关注我们的公众号FE One，会不定期分享JS函数式编程、深入Reaction、Rxjs、工程化、WebGL、中后台构建等前端知识<center>
 
 
 
-
+<!-- 
 # issue
 
 横坐标刻度值能够根据bar的正负转换方向
-最大值和最小值需要更新
+最大值和最小值需要更新 -->

@@ -1,11 +1,11 @@
 
 <p align="center">
-    <img  src="https://img.alicdn.com/tfs/TB1tTS0ShnaK1RjSZFtXXbC2VXa-200-147.svg"><br/>
+    <img  src="https://user-gold-cdn.xitu.io/2019/4/22/16a442821e5c550a?w=200&h=147&f=svg&s=2117"><br/>
 </p>
-
 # 教你开发图表库fchart系列第一章
 
 [工程分支](https://github.com/sheweichun/fchart/blob/Chapter_One/dev_doc/Chapter_One.md)
+
 
 整个系列里作者会带着大家一起完成一个从0到1图表库的开发，欢迎来[这里](https://github.com/sheweichun/fchart)踊跃拍砖
 
@@ -28,7 +28,7 @@
 
 限于我们的图表现在还没整出来，我们走一次抽象派，见下图
 
-![](https://img.alicdn.com/tfs/TB1O4K0QmzqK1RjSZFLXXcn2XXa-934-426.png)
+![](https://user-gold-cdn.xitu.io/2019/4/22/16a44282232087e3?w=934&h=426&f=png&s=10235)
 
 这是图展示了一个最基本的图表的组成部分(**我们由浅入深**)，它包含以下部分:
 
@@ -45,7 +45,7 @@
 ## 初步建模
 
 
-![](https://img.alicdn.com/tfs/TB1L5xKQAvoK1RjSZFwXXciCFXa-1768-904.png)
+![](https://user-gold-cdn.xitu.io/2019/4/22/16a442822248b9f5?w=1768&h=904&f=png&s=35827)
 
 
 
@@ -325,6 +325,8 @@ Point可以看看怎么画不同形状的点，还是很有意思的😊
 
 当然如果你有更强的意愿，还可以去实现其他类型的Serial
 
+### 动画
+本次动画的实现只是临时方案，后续会重构，所以这里就不展开了，有兴趣的可以到[这里](https://github.com/sheweichun/fchart/blob/Chapter_One/src/animation/index.ts)看源码
 
 ### fchart
 前面介绍了XAxis，YAxis和LineSerial，都还是各自独立的个体，这里我要介绍的是如何把这些有机的结合起来最终形成我们画出来的图表
@@ -484,7 +486,7 @@ this.series = series.map((serial,index)=>{
 
 本库选用parcel开箱即用的解决方案，不熟悉的同学如果对parcel感兴趣可以去[官网](https://parceljs.org)了解了解，没兴趣也没关系，按照以下指示也是能跑起demo来的
 
-```
+
 ### 安装依赖
 ```bash
 npm install
@@ -497,9 +499,10 @@ npm install
 npm run dev
 ```
 
+<p align="center">
+    <img  src="https://user-gold-cdn.xitu.io/2019/4/10/16a055f03c53753f?w=258&h=258&f=png&s=7273"><br/>
+    <span>FE One</span>
+</p>
 
-
-
-> 
-
+<center style="font-size:12px;color:#999;">关注我们的公众号FE One，会不定期分享JS函数式编程、深入Reaction、Rxjs、工程化、WebGL、中后台构建等前端知识<center>
 
