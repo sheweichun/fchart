@@ -136,9 +136,9 @@ export class YAxis implements IYAxis{
             length:_area.height
         }) as AxisOpt)
     }
-    getUnitWidth(){
-        return this.axis.unitWidth
-    }
+    // getUnitWidth(){
+    //     return this.axis.unitWidth
+    // }
     getYByValue(val:number):number{
         const {range,_area,min,max} = this;
         if(max - val >= 0 && val - min >= 0){
@@ -154,14 +154,13 @@ export class YAxis implements IYAxis{
 
 export class XAxis implements IXAxis{
     axis:Axis
-    yxisList:Array<YAxis>
     option:XAxisOption
-    constructor(private _area:Area, private _yxisList:Array<YAxis> ,option:XAxisOption) {
+    constructor(private _area:Area, private _yaxisList:Array<YAxis> ,option:XAxisOption) {
        this.option = option
     }
     getZeroY(){
-        for(let i = 0; i < this._yxisList.length; i++){
-            const yAxis = this._yxisList[i];
+        for(let i = 0; i < this._yaxisList.length; i++){
+            const yAxis = this._yaxisList[i];
             const ret = yAxis.getYByValue(0);
             if(ret != null) return ret;
         }

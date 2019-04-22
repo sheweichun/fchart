@@ -99,7 +99,7 @@ export interface IYAxis extends ILazyWidget{
     min:number
     range:number
     getYByValue(val:number):number
-    getUnitWidth():number
+    // getUnitWidth():number
     // getLenth():number
 }
 
