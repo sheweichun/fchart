@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" style="transform: scale(0.5);">
     <img style="width:200px;" src="https://img.alicdn.com/tfs/TB1ApeOSiLaK1RjSZFxXXamPFXa-340-250.svg"><br/>
 </p>
 
