@@ -2,29 +2,24 @@
 <p align="center">
     <img  src="https://user-gold-cdn.xitu.io/2019/4/22/16a442821e5c550a?w=200&h=147&f=svg&s=2117"><br/>
 </p>
-# 教你开发图表库fchart系列第一章
+
+# 教你开发图表库fchart系列第一章⚽⚽⚽⚽
 
 [工程分支](https://github.com/sheweichun/fchart/blob/Chapter_One/dev_doc/Chapter_One.md)
 
-
 整个系列里作者会带着大家一起完成一个从0到1图表库的开发，欢迎来[这里](https://github.com/sheweichun/fchart)踊跃拍砖
+
+**注:** 文章比较长，涉及源码分析，建议收藏一波，细细品味☕☕☕
 
 估计很多人会问，现在开源世界里的图表库多如牛毛，为什么自己还要再弄个图表库呢?
 * 开发库很多不假，但是成熟的框架都是大而全的，学习成本高，而实际业务中使用的图表都是比较简单的，尤其是移动端更是要求精简，但即便简单的图表也会掺杂个性化的需求，这个时候受框架的限制你会有一种无力感
 * 这时候如果你自己有一一套基础图表库，既能满足日常的业务开发，又能满足老板对可视化个性化定制，会让你觉得生成如此惬意~~
-* 当然如果最后这个库开发失败了，就权当学习好了
-
+* 当然如果最后这个库开发失败了，就权当学习好了😂😂
 
 在具体开始撸代码之前，我们需要想清楚图表的组成部分，这个库的架构是怎样的，开发者如何使用等等，形象点说就是我们先弄一个施工图出来
 
 
-## Demo演示
-下面这个动图就是我们本次要实现的效果,包含了X轴、Y轴、折线图、柱形图和动画
-
-![](./demo.gif)
-
-
-## 图表组成
+## 图表组成分析
 
 限于我们的图表现在还没整出来，我们走一次抽象派，见下图
 
@@ -44,9 +39,13 @@
 
 ## 初步建模
 
-
 ![](https://user-gold-cdn.xitu.io/2019/4/22/16a442822248b9f5?w=1768&h=904&f=png&s=35827)
 
+
+## Demo演示
+下面这个动图就是我们本次要实现的效果,包含了X轴、Y轴、折线图、柱形图和动画
+
+![](./demo.gif)
 
 
 ## 编程语言选择
@@ -58,13 +57,39 @@
 
 如果你是typescript新手，建议你上官网[中文官网](https://www.tslang.cn/)学习学习
 
+
 ## Coding
 
 ### 坐标轴
 
-由前面图分析，我们会提供基础Axis，然后在Axis上分别抽象出YAxis,XAxis
+在具体分析源码之前我们先介绍下三个概念
+1. unitWidth 轴的基础距离单位(用轴长除以值的个数得到)
+2. tickUnit  刻度之间跨越的值
+3. tickWidth 刻度之间的距离,一般是unitWidth的整数倍，这样才能保证tick之间正好可以容纳整数个值
+假设对应X轴的数据是1-40的数字,能够将轴评分成39份
+接下来我们来看看下面这几个场景
 
-#### [Axis]((https://github.com/sheweichun/fchart/blob/a8fd713e0d3939cea8bb65bdad44ed7ca82f3fc4/src/widgets/axis.ts#L212))
+* 刻度与数字一一对应(unitWidth = (轴长度 / 39),tickUnit = 1,tickWidth = unitWidth)
+![最简单](https://img.alicdn.com/tfs/TB1fLrdSXzqK1RjSZFoXXbfcXXa-2334-104.jpg)
+这种处理没问题，但是当40变成100、1000甚至10000的时候，刻度会变得密密麻麻，文字也会相互重叠
+
+* 跨越多个值标识一个刻度(unitWidth = (轴长度 / 39),tickUnit = 2,tickWidth = 2 * unitWidth)
+![splited](https://img.alicdn.com/tfs/TB1nhzeSjTpK1RjSZKPXXa3UpXa-2326-116.jpg)
+可以看出这里跨越2个值出现一个刻度，这样即便10000的数据,我们只要把这个跨越值(我命名为tickUnit)调整为1000，依旧能很好的显示
+
+* 对于柱状图我们需要把柱子和label显示在刻度之间(tickUnit = 1,unitWidth = (轴长度 / (39 + tickUnit)),tickWidth = unitWidth,并设置了boundaryGap)
+![boundaryGap](https://img.alicdn.com/tfs/TB1IFHbSirpK1RjSZFhXXXSdXXa-2334-108.jpg)
+对比刻度与数字一一对应，这里的刻度数多了个1，并且每个数值都显示在两个刻度之间
+
+假设dLen = 数据长度 - 1;
+我们可以总结出
+* unitWidth = length / (dLen + ( boundaryGap ?  tickUnit : 0)); //每个数据点之间的距离
+* tickWidth = tickUnit * unitWidth; //每个tick的宽度
+* 同时tick和label是分别进行坐标定位
+
+根据以上的分析，我们开发了[Axis]((https://github.com/sheweichun/fchart/blob/a8fd713e0d3939cea8bb65bdad44ed7ca82f3fc4/src/widgets/axis.ts#L212))基础类
+
+#### [Axis](https://github.com/sheweichun/fchart/blob/a8fd713e0d3939cea8bb65bdad44ed7ca82f3fc4/src/widgets/axis.ts#L212)
 
 * [构造函数](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L230)
 
@@ -72,9 +97,7 @@
 ...
 constructor(opt:AxisOpt){
     this.data = (opt.data || []) as string[] //label数据
-    const mergeOpt = assign({},defaultAxisOpt,opt || {}) as AxisOpt;
-    const {x,y,length,axisTick,axisLabel,axisLine,horizontal,reverse,splitNumber,boundaryGap} = mergeOpt;
-    this.boundaryGap = boundaryGap;
+    ...
     /*x,y为轴线的中心 */
     this.x = x; 
     this.y = y; 
@@ -98,10 +121,10 @@ constructor(opt:AxisOpt){
 }
 ...
 ```
-
-大部分还是参数的解析，核心我们还是看下createHorizontatickAndLabels
+核心逻辑还是计算tickUnit,unitWidth,tickWidth，然后通过parseStartAndEndPoint解析轴线的起点和终点，然后根据horizontal创建水平或者垂直的tick和label，接下来我们通过createHorizontatickAndLabels看看这个过程
 
 * [createHorizontatickAndLabels](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L262)
+
 ```typescript
 createHorizontatickAndLabels(opt:AxisOpt){
     const ticks = []; //刻度列表
@@ -134,17 +157,21 @@ createHorizontatickAndLabels(opt:AxisOpt){
     this.ticks = ticks;
 }
 ```
-[AxisTick](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L39)和[AxisLabel](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L33)都是直接传入的参数分别绘制线条和点，比较简单，不展开讲解
-
+[AxisTick](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L39)和
+[AxisLabel](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/axis.ts#L33)
+都是直接传入的参数分别绘制线条和点，比较简单，不展开讲解
 
 
 ### XAxis
-XAxis是通过代理的方式来实现,而不是直接继承Axis,更加灵活
+Axis实现了轴的绘制，但是针对X轴还有自己的逻辑
+* 根据绘制区域计算轴线的x
+* 根据Y轴的0刻度计算y
+* 根据数据的index获取对应的x坐标
+
+因此我们封装了XAxis根据自己的逻辑去生成数据和配置，然后使用Axis去绘制
 ```typescript
  class XAxis implements IXAxis{
-    axis:Axis
-    yxisList:Array<YAxis>
-    option:XAxisOption
+    ...
     /* 
     * _area 表示已X轴和Y轴为边的serial绘制区域
     * _yaxisList 表示所有的Y轴列表
@@ -165,14 +192,10 @@ XAxis是通过代理的方式来实现,而不是直接继承Axis,更加灵活
         const {isTop,axisOpt} = option;
         let labelBase = isTop ? _area.top : _area.bottom //X轴显示在上面还是下面
         let y = this.getZeroY(); //获取Y轴上0对应的Y坐标
-        if(y == null){
-            y = labelBase
-        }
+        if(y == null){ y = labelBase }
         const x = _area.x
         this.axis = new Axis(assign({boundaryGap:true},axisOpt,{
-            x,
-            y,
-            labelBase,
+            x,y,labelBase,
             length:_area.width //serial绘制区域的宽度就是轴的长度
         }))
     }
@@ -187,15 +210,21 @@ XAxis是通过代理的方式来实现,而不是直接继承Axis,更加灵活
 ```
 
 ### YAxis
-YAxis也是通过代理的方式来实现，目前来看YAxis相比XAxis复杂一些，因为它需要根据数据的最大值和最小值自动计算整形刻度值
+
+YAxis也有自己的逻辑，需要根据数据的最大值和最小值自动计算整形刻度值
+假设现在Y轴的最大值是280，最小值是0，然后需要把Y轴分成10段，见下图
+
+![](https://img.alicdn.com/tfs/TB1eKBjSCzqK1RjSZPxXXc4tVXa-41-550.png)
+
+你会发现这个刻度值看起来很乱，我们的期望是这样的
+
+![](https://img.alicdn.com/tfs/TB1XYGofu3tHKVjSZSgXXX4QFXa-45-554.png)
+
+我们进入到源码分析
 
 ```typescript
 class YAxis implements IYAxis{
-    axis:Axis
-    max:number
-    min:number
-    range:number
-    axisIndex:number
+    ...
     constructor(private _area:Area,private _opt:{
         isRight?:boolean,
         max:number,
@@ -211,11 +240,7 @@ class YAxis implements IYAxis{
         this.range = this.max - this.min; //Y轴的值范围
         let labelBase = isRight ? _area.right : _area.left, y = _area.y 
         this.axis = new Axis(assign({},axisOpt,{
-            x:labelBase,
-            y,
-            labelBase,
-            data:ret.data,
-            horizontal:false,
+            x:labelBase,y,labelBase,data:ret.data,horizontal:false,
             boundaryGap:false,
             length:_area.height
         }) as AxisOpt)
@@ -232,6 +257,7 @@ class YAxis implements IYAxis{
     }
 }
 ```
+最大值和最小值地修正以及刻度的生成都是在getUnitsFromMaxAndMin完成的，所以我们需要看看getUnitsFromMaxAndMin
 
 [getUnitsFromMaxAndMin分析](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/util/math.ts#L38)
 ```typescript
@@ -243,7 +269,7 @@ function getUnitsFromMaxAndMin(max:number,min:number,splitNumber:number = 10){
     const range = max - min; //计算差值
     /* 根据差值分割成splitNumber个单位,最终就是Y轴的刻度 */
     let unit = Math.ceil(range / splitNumber);
-    unit = (Math.floor(unit / 10) + 1) * 10
+    unit = (Math.floor(unit / 10) + 1) * 10 //把刻度之间的值跨度也调整为10的整数倍
     let data = [],tmp = min;
     while(tmp < max){
         data.push(tmp);
@@ -259,9 +285,18 @@ function getUnitsFromMaxAndMin(max:number,min:number,splitNumber:number = 10){
 }
 ```
 
+至此我们终于完成了坐标轴的分析和代码编写，接下来我们要来分析根据坐标轴如何构建我们的Serial
 
-### LineSerial
-分析完Axis之后，我们再来看看如何在XAxis和YAxis的基础上去构建具体的LineSerial，代码整体看上来还是很清晰的
+
+### LineSerial(折线图)📈
+画折现图的核心思想
+1. 确定绘制区域
+   所以LineSerial需要有自己的Area
+2. 将数据转化成一个个的点
+   每个数据的特征是有值和下标，通过Y轴可以把值转换成y坐标，通过X轴可以把下标转换成x坐标，所以LineSerial依赖对应的X轴和Y轴
+3. 将点连成线
+   有了数据，需要有视图来把这些点连成线，这里我们又封装了[Line](https://github.com/sheweichun/fchart/blob/Chapter_One/src/widgets/line.ts)
+
 
 ```typescript
 class LineSerial implements ILazyWidget{
@@ -318,12 +353,12 @@ class LineSerial implements ILazyWidget{
 }
 ```
 
-对[Line]和[Point]有兴趣的同学可以分别点击进去看，基本上就是根据参数绘制线条和点，基本看看就能看懂，Line里可以看看怎么实现光滑画图，
+对[Line](https://github.com/sheweichun/fchart/blob/Chapter_One/src/widgets/line.ts)和[Point](https://github.com/sheweichun/fchart/blob/Chapter_One/src/widgets/point.ts)有兴趣的同学可以分别点击进去看，基本上就是根据参数绘制线条和点，基本看看就能看懂，Line里可以看看怎么实现光滑画图，
 Point可以看看怎么画不同形状的点，还是很有意思的😊
 
 对[BarSerial](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/serials/barSerial.ts#L2)感兴趣可以点[这里](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/widgets/serials/barSerial.ts#L2)，按照上面的思路去分析
 
-当然如果你有更强的意愿，还可以去实现其他类型的Serial
+当然如果你有更强的意愿，还可以去实现其他类型的Serial来提交PR
 
 ### 动画
 本次动画的实现只是临时方案，后续会重构，所以这里就不展开了，有兴趣的可以到[这里](https://github.com/sheweichun/fchart/blob/Chapter_One/src/animation/index.ts)看源码
@@ -392,19 +427,22 @@ export default class Fchart{
     }
     draw(){
         const {painter} = this;
+        //绘制x轴
         this.XAxisList.forEach((xAxis)=>{
             xAxis.draw(painter)
         })
+        //绘制y轴
         this.YAxisList.forEach((yAxis)=>{
             yAxis.draw(painter)
         })
+        //绘制serial
         this.series.forEach((serial)=>{
             serial.draw(painter)
         })
     }
 }
 ```
-讲解完主流程后，我们在分析下createXYAxises和createSerialCharts分别做了什么事情
+讲解完主流程后，我们来看看createXYAxises中是如何创建X和Y轴的，createSerialCharts是如何创建Serial的
 
 #### [createXYAxises](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/index.ts#L75)
 ```typescript
@@ -415,14 +453,7 @@ series.forEach((serial)=>{
     const {data,yAxisIndex = 0,xAxisIndex = 0} = serial
     let yAxisItem = yAxisItemList[yAxisIndex];
     let xAxisItem = xAxisItemList[xAxisIndex]; 
-    if(yAxisItem == null){
-        yAxisItem = {max:data[0],min:data[0]}
-        yAxisItemList[yAxisIndex] = yAxisItem;
-    }
-    if(xAxisItem == null){
-        xAxisItem = {max:data[0],min:data[0]}
-        xAxisItemList[xAxisIndex] = xAxisItem;
-    }
+    ...
     let {max,min} = maxAndMin(data,yAxisItem);
     if(min > 0) {min = 0}
     yAxisItem.min = min
@@ -457,25 +488,17 @@ this.series = series.map((serial,index)=>{
     const yAxis = this.YAxisList[yAxisIndex];
     const xAxis = this.XAxisList[xAxisIndex];
     const {type} = serial;
-    const curColor = curItem(colors,index);
+    ...
     const baseOpt = assign({},serial,{
         area:this.paintArea,
         xAxis:xAxis,
         yAxis:yAxis
     })
     if(type === 'line'){
-        if(baseOpt.lineStyle == null){
-            baseOpt.lineStyle = {};
-        }
-        baseOpt.lineStyle = baseOpt.lineStyle || {}
-        baseOpt.pointStyle = baseOpt.pointStyle || {}
-        baseOpt.pointStyle.borderColor = curColor
-        baseOpt.lineStyle.color = curColor;
+        ...
         return new LineSerial(baseOpt)
     }else if(type === 'bar'){
-        baseOpt.barStyle = baseOpt.barStyle || {color:null}
-        baseOpt.barStyle.color = curColor;
-        xAxis.option.axisOpt.boundaryGap = true;
+        ...
         return new BarSerial(baseOpt)
     }
 })
@@ -498,6 +521,8 @@ npm install
 ```bash
 npm run dev
 ```
+
+## 关注我们
 
 <p align="center">
     <img  src="https://user-gold-cdn.xitu.io/2019/4/10/16a055f03c53753f?w=258&h=258&f=png&s=7273"><br/>
