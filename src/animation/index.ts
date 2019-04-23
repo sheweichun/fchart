@@ -38,7 +38,7 @@ const Animation:{
     animationItemList:[],
     animationFlag:false,
     addAnimationWidget(widget:IAnimationWidget,option?:AnimationOption){
-        const aniOption = assign({duration:500},option || {}) as AnimationOption
+        const aniOption = assign({duration:1200},option || {}) as AnimationOption
         Animation.animationItemList.push({
             widget,
             option:aniOption
