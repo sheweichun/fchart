@@ -123,6 +123,7 @@ export class YAxis implements IYAxis{
         const ret = getUnitsFromMaxAndMin(max,min)
         this.max = ret.max;
         this.min = ret.min;
+
         this.range = this.max - this.min;
         // console.log('range :',this.range,this.max,this.min);
         let labelBase = isRight ? _area.right : _area.left, y = _area.y

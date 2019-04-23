@@ -48,7 +48,7 @@ function generate(count,serialCount,range=300){
     }
 }
 
-const total = 100;
+const total = 40;
 
 const {xData,series} = generate(total,3,1000);
 
@@ -58,8 +58,8 @@ const chart = new Fchart(canvas,{
     title:'Title',
     subTitle:'subTitle', 
     xAxis:{
-        splitNumber:total / 2,
-        boundaryGap:false,
+        // splitNumber:total / 2,
+        boundaryGap:true,
         data:xData,
         // reverse:true,
         axisLabel:{
@@ -71,17 +71,17 @@ const chart = new Fchart(canvas,{
     },
     series:[
    
-        {
-            type:'bar',
-            barStyle:{
-                // widthRatio:0.25
-                // color:'yellow'
-            },
-            // data:[80,30,10,92,72,-46,29,50,29,34,18]
-            // data:[80,30,10,92,72,46,29,50,29,34,18]
-            data:series[0]
-            // data:[201, -128, 103, 20, 74, 279, 268, 69, 255, 1, 76, 91, 243, 217, 155, 247, 20, 250, 37, 111]
-        },
+        // {
+        //     type:'bar',
+        //     barStyle:{
+        //         // widthRatio:0.25
+        //         // color:'yellow'
+        //     },
+        //     // data:[80,30,10,92,72,-46,29,50,29,34,18]
+        //     // data:[80,30,10,92,72,46,29,50,29,34,18]
+        //     data:series[0]
+        //     // data:[201, -128, 103, 20, 74, 279, 268, 69, 255, 1, 76, 91, 243, 217, 155, 247, 20, 250, 37, 111]
+        // },
         {
             type:'line',
             // reverse:true,
@@ -95,8 +95,8 @@ const chart = new Fchart(canvas,{
             },
             // data:[80,30,10,92,72,-46,29,50,29,34,18]
             // data:[80,30,10,92,72,46,29,50,29,34,18]
-            data:series[0]
-            // data:[201, -128, 103, 20, 74, 279, 268, 69, 255, 1, 76, 91, 243, 217, 155, 247, 20, 250, 37, 111]
+            // data:series[0]
+            data:[201, 128, 103, 20, 74, 279, 268, 69, 255, 1, 76, 91, 243, 217, 155, 247, 20, 250, 37, 111]
         }
         // ,{
         //     type:'line',

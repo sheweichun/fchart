@@ -38,7 +38,6 @@ export function maxAndMin(arr:number[],origin:{max:number,min:number}){
 export function getUnitsFromMaxAndMin(max:number,min:number,splitNumber:number = 10){
     max = (Math.floor(max / 10 ) + 1) * 10
     min = Math.floor(min / 10 )  * 10
-    
     const range = max - min;
     let unit = Math.ceil(range / splitNumber);
     unit = (Math.floor(unit / 10) + 1) * 10
