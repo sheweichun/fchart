@@ -80,11 +80,11 @@ const Animation:{
                 const {duration} = option;
                 if(diffTm > duration){
                     widget.transtion(duration,duration)
-                    widget.draw(painter)
+                    // widget.draw(painter)
                     widget.onComplete();
                 }else{
                     const ret = widget.transtion(diffTm,duration);
-                    widget.draw(painter)
+                    // widget.draw(painter)
                     if(ret !== false){
                         reseverdWidgets.push(animationItemList[i]);
                     }else{
