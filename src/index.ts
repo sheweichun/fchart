@@ -70,7 +70,7 @@ export default class Fchart{
         this.createSerialCharts(series);
         this.init();
         this.draw(); 
-        Animation.startAnimation(this.painter,this.draw.bind(this));
+        // Animation.startAnimation(this.painter,this.draw.bind(this));
     }
     createXYAxises(series:Array<SerialOption>,xAxis:AxisOpt,yAxis:AxisOpt){
         const yAxisItemList = [],xAxisItemList = []
@@ -158,8 +158,8 @@ export default class Fchart{
         this.YAxisList.forEach((yAxis)=>{
             yAxis.draw(painter)
         })
-        this.series.forEach((serial)=>{
-            serial.draw(painter)
-        })
+        // this.series.forEach((serial)=>{
+        //     serial.draw(painter)
+        // })
     }
 }

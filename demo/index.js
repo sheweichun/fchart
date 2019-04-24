@@ -48,7 +48,7 @@ function generate(count,serialCount,range=300){
     }
 }
 
-const total = 100;
+const total = 40;
 
 const {xData,series} = generate(total,3,1000);
 console.log('series[0] :',series[0]);
