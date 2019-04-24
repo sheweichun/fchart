@@ -3,21 +3,23 @@
     <img  src="https://user-gold-cdn.xitu.io/2019/4/22/16a442821e5c550a?w=200&h=147&f=svg&s=2117"><br/>
 </p>
 
-# 教你开发图表库fchart系列第一章
+# 教你开发图表库fchart系列第一章⚽⚽⚽⚽
 
 [工程分支](https://github.com/sheweichun/fchart/blob/Chapter_One/dev_doc/Chapter_One.md)
 
 整个系列里作者会带着大家一起完成一个从0到1图表库的开发，欢迎来[这里](https://github.com/sheweichun/fchart)踊跃拍砖
 
+**注:** 文章比较长，涉及源码分析，建议收藏一波，细细品味☕☕☕
+
 估计很多人会问，现在开源世界里的图表库多如牛毛，为什么自己还要再弄个图表库呢?
 * 开发库很多不假，但是成熟的框架都是大而全的，学习成本高，而实际业务中使用的图表都是比较简单的，尤其是移动端更是要求精简，但即便简单的图表也会掺杂个性化的需求，这个时候受框架的限制你会有一种无力感
 * 这时候如果你自己有一一套基础图表库，既能满足日常的业务开发，又能满足老板对可视化个性化定制，会让你觉得生成如此惬意~~
-* 当然如果最后这个库开发失败了，就权当学习好了
+* 当然如果最后这个库开发失败了，就权当学习好了😂😂
 
 在具体开始撸代码之前，我们需要想清楚图表的组成部分，这个库的架构是怎样的，开发者如何使用等等，形象点说就是我们先弄一个施工图出来
 
 
-## 完整的图表组成
+## 图表组成分析
 
 限于我们的图表现在还没整出来，我们走一次抽象派，见下图
 
@@ -286,7 +288,7 @@ function getUnitsFromMaxAndMin(max:number,min:number,splitNumber:number = 10){
 至此我们终于完成了坐标轴的分析和代码编写，接下来我们要来分析根据坐标轴如何构建我们的Serial
 
 
-### LineSerial(折线图)
+### LineSerial(折线图)📈
 画折现图的核心思想
 1. 确定绘制区域
    所以LineSerial需要有自己的Area
@@ -358,8 +360,115 @@ Point可以看看怎么画不同形状的点，还是很有意思的😊
 
 当然如果你有更强的意愿，还可以去实现其他类型的Serial来提交PR
 
-### 动画
-本次动画的实现只是临时方案，后续会重构，所以这里就不展开了，有兴趣的可以到[这里](https://github.com/sheweichun/fchart/blob/Chapter_One/src/animation/index.ts)看源码
+细心的同学一定注意到了每个点都会生成startX、startY、targetX、targetY、x、y,start表示初始态,target表示目标态,有了这些信息我们才能去生成动画，这块接下来就会讲到
+
+### [动画](https://github.com/sheweichun/fchart/blob/Chapter_One/src/animation/index.ts)
+**注: 本次动画的实现只是临时方案，后续会重构** 
+动画核心就是已知初始态和目标态，通过缓动函数生成动画帧，并且达到60fps，就形成了前面我们看到的动画效果
+
+#### [缓动函数](https://github.com/sheweichun/fchart/blob/Chapter_One/src/animation/easing.ts)
+
+```typescript
+const effects = {
+    ...
+    easeInQuad: function ( t, b, c, d) {
+    return c*(t/=d)*t + b;
+    },
+    easeOutQuad: function ( t, b, c, d) {
+        return -c *(t/=d)*(t-2) + b;
+    },
+    ...
+}
+```
+
+每个函数上都是四个参数
+* t 动画播放时间 (当前时间 - 动画开始时间)
+* b 初始值
+* c 变化值 (目标值 - 初始值)
+* d 动画持续时间
+
+如果你想体验缓动函数，可以点击[这里](http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm)体验
+
+#### [动画播放](https://github.com/sheweichun/fchart/blob/480430883b7057bedff94386395a9a1ef8d80ef3/src/animation/index.ts#L66)
+
+
+```typescript
+
+/* 保证60fps */
+const requestAnimFrame = window.requestAnimationFrame ||
+window.webkitRequestAnimationFrame ||
+window.mozRequestAnimationFrame ||
+window.oRequestAnimationFrame ||
+window.msRequestAnimationFrame ||
+function(callback) {
+    return window.setTimeout(callback, 1000 / 60);
+}
+
+startAnimation(painter:IPainter,draw:()=>void){
+    ...
+    /*animationItemList 存储了所有需要动画的图形*/
+    animationItemList.forEach((item)=>{
+        item.widget.onStart();  
+    })
+    let startTm = Date.now();
+    const callback = function(){
+        const diffTm = (Date.now() - startTm); //对应参数t
+        const reseverdWidgets = [];
+        for(let i = 0; i < animationItemList.length; i++){
+            const {widget,option} = animationItemList[i];
+            const {duration} = option;
+            if(diffTm > duration){
+                /* 图形完成状态改变 */
+                widget.transtion(duration,duration)
+                widget.onComplete();
+            }else{
+                const ret = widget.transtion(diffTm,duration);
+                if(ret !== false){
+                    reseverdWidgets.push(animationItemList[i]);
+                }else{
+                    widget.onComplete();
+                }
+            }
+        }
+        /* 清除画板 */
+        painter.clear();
+        /* 所有图形重新绘制 */
+        draw();
+        Animation.animationItemList = reseverdWidgets;
+        if(reseverdWidgets.length > 0){
+            /* 还有没结束动画的图形，需要继续运行 */
+            requestAnimFrame(callback)
+        }else{
+            Animation.animationFlag = false;
+        }
+    }
+    ...
+    requestAnimFrame(callback)
+    ...
+}
+```
+根据上面的源码，startAnimation只是提供了比较初级的动画框架，动画的具体实现是由每个widget自己去实现的，核心的接口包括onStart,transtion和onComplete,这里我们来看看[Point](https://github.com/sheweichun/fchart/blob/Chapter_One/src/widgets/point.ts)是怎么实现的
+
+#### [Point](https://github.com/sheweichun/fchart/blob/Chapter_One/src/widgets/point.ts)
+```typescript
+class Point implements IPointWidet{
+    onComplete(){
+        //把当前的x,y当做后面动画的初始状态
+        this.startX = this.x;
+        this.startY = this.y;
+    }
+    onStart(){
+        //分别计算x,y的变化值
+        this.diffX = this.targetX - this.startX;
+        this.diffY = this.targetY - this.startY;
+    } 
+    transtion(tm:number,duration:number):boolean | void{
+        //通过缓动函数计算新的x,y
+		this.x = Easing.easeInOutCubic(tm,this.startX,this.diffX,duration);
+        this.y = Easing.easeInOutCubic(tm,this.startY,this.diffY,duration);
+    }
+}
+```
 
 ### fchart
 前面介绍了XAxis，YAxis和LineSerial，都还是各自独立的个体，这里我要介绍的是如何把这些有机的结合起来最终形成我们画出来的图表
@@ -425,19 +534,22 @@ export default class Fchart{
     }
     draw(){
         const {painter} = this;
+        //绘制x轴
         this.XAxisList.forEach((xAxis)=>{
             xAxis.draw(painter)
         })
+        //绘制y轴
         this.YAxisList.forEach((yAxis)=>{
             yAxis.draw(painter)
         })
+        //绘制serial
         this.series.forEach((serial)=>{
             serial.draw(painter)
         })
     }
 }
 ```
-讲解完主流程后，我们在分析下createXYAxises和createSerialCharts分别做了什么事情
+讲解完主流程后，我们来看看createXYAxises中是如何创建X和Y轴的，createSerialCharts是如何创建Serial的
 
 #### [createXYAxises](https://github.com/sheweichun/fchart/blob/61892f3e2613527e306baeb118636f6974493bac/src/index.ts#L75)
 ```typescript
@@ -448,14 +560,7 @@ series.forEach((serial)=>{
     const {data,yAxisIndex = 0,xAxisIndex = 0} = serial
     let yAxisItem = yAxisItemList[yAxisIndex];
     let xAxisItem = xAxisItemList[xAxisIndex]; 
-    if(yAxisItem == null){
-        yAxisItem = {max:data[0],min:data[0]}
-        yAxisItemList[yAxisIndex] = yAxisItem;
-    }
-    if(xAxisItem == null){
-        xAxisItem = {max:data[0],min:data[0]}
-        xAxisItemList[xAxisIndex] = xAxisItem;
-    }
+    ...
     let {max,min} = maxAndMin(data,yAxisItem);
     if(min > 0) {min = 0}
     yAxisItem.min = min
@@ -490,25 +595,17 @@ this.series = series.map((serial,index)=>{
     const yAxis = this.YAxisList[yAxisIndex];
     const xAxis = this.XAxisList[xAxisIndex];
     const {type} = serial;
-    const curColor = curItem(colors,index);
+    ...
     const baseOpt = assign({},serial,{
         area:this.paintArea,
         xAxis:xAxis,
         yAxis:yAxis
     })
     if(type === 'line'){
-        if(baseOpt.lineStyle == null){
-            baseOpt.lineStyle = {};
-        }
-        baseOpt.lineStyle = baseOpt.lineStyle || {}
-        baseOpt.pointStyle = baseOpt.pointStyle || {}
-        baseOpt.pointStyle.borderColor = curColor
-        baseOpt.lineStyle.color = curColor;
+        ...
         return new LineSerial(baseOpt)
     }else if(type === 'bar'){
-        baseOpt.barStyle = baseOpt.barStyle || {color:null}
-        baseOpt.barStyle.color = curColor;
-        xAxis.option.axisOpt.boundaryGap = true;
+        ...
         return new BarSerial(baseOpt)
     }
 })
